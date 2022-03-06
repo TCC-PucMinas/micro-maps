@@ -2,10 +2,8 @@ package controller
 
 import (
 	"context"
-	"fmt"
 	"micro-maps/communicate"
 	"micro-maps/models"
-	"micro-maps/service"
 )
 
 type MapServer struct{}
@@ -14,7 +12,7 @@ func (s *MapServer) GetLocation(ctx context.Context, request *communicate.Geloca
 
 	res := &communicate.GelocationResponse{}
 
-	maps := models.Map{
+	maps := models.Maps{
 		Street:   request.Street,
 		District: request.District,
 		City:     request.City,
@@ -24,17 +22,27 @@ func (s *MapServer) GetLocation(ctx context.Context, request *communicate.Geloca
 		ZipCode:  request.ZipCode,
 	}
 
-	googleServie := service.LatAndLng{}
+	maps.GenerateInline()
 
-	address := fmt.Sprintf("%v, %v, %v, %v, %v, %v", maps.Street, maps.Number, maps.District, maps.City, maps.State, maps.Country)
+	if m, _ := models.GetMapByAddres(maps.Inline); m.Id != 0 {
+		res = &communicate.GelocationResponse{
+			Lat: maps.Lat,
+			Lng: maps.Lng,
+		}
+		return res, nil
+	}
 
-	if err := googleServie.GetLatAndLngByAddress(address); err != nil {
+	if err := maps.GetLocation(); err != nil {
+		return res, err
+	}
+
+	if err := maps.CreateMaps(); err != nil {
 		return res, err
 	}
 
 	res = &communicate.GelocationResponse{
-		Lat: googleServie.Lat,
-		Lng: googleServie.Lng,
+		Lat: maps.Lat,
+		Lng: maps.Lng,
 	}
 
 	return res, nil

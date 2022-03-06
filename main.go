@@ -23,7 +23,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	communicate.RegisterGelocationCommunicateServer(grpcServer, &controller.MapServer{})
 
-	fmt.Printf("[x] - Server logistic listen http://localhost:%v\n", port)
+	fmt.Printf("[x] - Server maps listen http://localhost:%v\n", port)
 
 	if err := grpcServer.Serve(listener); err != nil {
 		panic(err.Error())

@@ -6,11 +6,13 @@ use db_maps;
 
 create table maps (
 	id int unsigned auto_increment primary key,
+	inline varchar(255) not null,
     street varchar(255) not null,
     district varchar(255) not null,
     city varchar(255) not null,
     country varchar(255) not null,
     state varchar(255) not null,
+    zipCode varchar(255) not null,
     number varchar(255) not null,
     `created_at` datetime default now()
 );
