@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "/communicate";
+
+message GelocationRequest {
+  string street = 1;
+  string district = 2;
+  string city = 3;
+  string country = 4;
+  string state = 5;
+  string number = 6;
+  string ZipCode = 7;
+}
+
+message GelocationResponse {
+    string lat = 1;
+    string lng = 2;
+}
+
+service GelocationCommunicate {
+  rpc GetLocation (GelocationRequest) returns (GelocationResponse) {};
+}
