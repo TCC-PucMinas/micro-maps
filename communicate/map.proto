@@ -17,6 +17,25 @@ message GelocationResponse {
     string lng = 2;
 }
 
+message LatAndLng {
+  string lat = 1;
+  string lng = 2;
+}
+
+message DirectionLocationRequest{
+  LatAndLng origin = 1;
+  LatAndLng destiny = 2;
+}
+
+message DirectionLocationResponse {
+  LatAndLng origin = 1;
+  LatAndLng destiny = 2;
+  string HumanReadable = 3;
+  int64 Meters = 4;
+  int64 Duration = 5;
+}
+
 service GelocationCommunicate {
   rpc GetLocation (GelocationRequest) returns (GelocationResponse) {};
+  rpc DirectionLocation(DirectionLocationRequest) returns (DirectionLocationResponse) {}
 }

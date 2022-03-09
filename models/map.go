@@ -65,21 +65,29 @@ func (m *Maps) CreateMaps() error {
 }
 
 func (m *Maps) setRedisCacheMapGetByInline() error {
-	db := db.ConnectDatabaseRedis()
+	redis, err := db.ConnectDatabaseRedis()
 
-	json, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+
+	marshal, err := json.Marshal(m)
 
 	if err != nil {
 		return err
 	}
 	key := fmt.Sprintf("%v - %v", keyMapByAddress, m.Inline)
 
-	return db.Set(key, json, 24*time.Hour).Err()
+	return redis.Set(key, marshal, 24*time.Hour).Err()
 }
 
 func (m *Maps) getRedisCacheMapGetByInline() error {
 
-	redis := db.ConnectDatabaseRedis()
+	redis, err := db.ConnectDatabaseRedis()
+
+	if err != nil {
+		return err
+	}
 
 	key := fmt.Sprintf("%v - %v", keyMapByAddress, m.Inline)
 
