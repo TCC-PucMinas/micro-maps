@@ -32,7 +32,6 @@ message DirectionLocationResponse {
   LatAndLng destiny = 2;
   string HumanReadable = 3;
   int64 Meters = 4;
-  int64 Duration = 5;
 }
 
 service GelocationCommunicate {

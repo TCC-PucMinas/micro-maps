@@ -4,8 +4,6 @@ import (
 	"context"
 	"micro-maps/communicate"
 	"micro-maps/models"
-	"micro-maps/service"
-	"time"
 )
 
 type MapServer struct{}
@@ -53,18 +51,39 @@ func (s *MapServer) GetLocation(ctx context.Context, request *communicate.Geloca
 func (s *MapServer) DirectionLocation(ctx context.Context, request *communicate.DirectionLocationRequest) (*communicate.DirectionLocationResponse, error) {
 	res := &communicate.DirectionLocationResponse{}
 
-	origin := service.LatAndLng{
+	origin := models.LatAndLng{
 		Lat: request.Origin.Lat,
 		Lng: request.Origin.Lng,
 	}
 
-	destiny := service.LatAndLng{
+	destiny := models.LatAndLng{
 		Lat: request.Destiny.Lat,
 		Lng: request.Destiny.Lng,
 	}
-	serviceCalculate := service.Calculate{
+	serviceCalculate := models.Calculate{
 		Origin:  origin,
 		Destiny: destiny,
+	}
+
+	// get cache calculate or database
+	if err := serviceCalculate.GetCalculateOriginAndDestiny(); err == nil || serviceCalculate.Id == 0 {
+		originResponse := &communicate.LatAndLng{
+			Lat: origin.Lat,
+			Lng: origin.Lng,
+		}
+
+		destinyResponse := &communicate.LatAndLng{
+			Lat: destiny.Lat,
+			Lng: destiny.Lng,
+		}
+
+		res.HumanReadable = serviceCalculate.HumanReadable
+		res.Meters = int64(serviceCalculate.Meters)
+		res.HumanReadable = serviceCalculate.HumanReadable
+
+		res.Origin = originResponse
+		res.Destiny = destinyResponse
+		return res, nil
 	}
 
 	if err := serviceCalculate.CalculateRoute(); err != nil {
@@ -81,10 +100,6 @@ func (s *MapServer) DirectionLocation(ctx context.Context, request *communicate.
 		Lng: destiny.Lng,
 	}
 
-	res.Duration = int64(serviceCalculate.Duration)
-
-	h, _ := time.ParseDuration(serviceCalculate.Duration.String())
-	res.Duration = int64(h.Minutes())
 	res.HumanReadable = serviceCalculate.HumanReadable
 	res.Meters = int64(serviceCalculate.Meters)
 	res.HumanReadable = serviceCalculate.HumanReadable

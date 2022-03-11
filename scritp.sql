@@ -16,3 +16,12 @@ create table maps (
     number varchar(255) not null,
     `created_at` datetime default now()
 );
+
+create table calculates(
+    id int unsigned auto_increment primary key,
+    origin json not null,
+    destiny json not null,
+    humanReadble varchar(255) not null,
+    meters int not null,
+    `created_at` datetime default now()
+)

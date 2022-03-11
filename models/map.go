@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"micro-maps/db"
-	"micro-maps/service"
 	"time"
 )
 
@@ -32,7 +31,7 @@ func (m *Maps) GenerateInline() {
 
 func (m *Maps) GetLocation() error {
 
-	googleServie := service.LatAndLng{}
+	googleServie := LatAndLng{}
 
 	if err := googleServie.GetLatAndLngByAddress(m.Inline); err != nil {
 		return err
@@ -40,26 +39,6 @@ func (m *Maps) GetLocation() error {
 
 	m.Lat = googleServie.Lat
 	m.Lng = googleServie.Lng
-
-	return nil
-}
-
-func (m *Maps) CreateMaps() error {
-	sql := db.ConnectDatabase()
-
-	query := "insert into maps (inline, street, district, city, zipCode, country, `state`, `number`, lat, lng) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
-	createDestination, err := sql.Prepare(query)
-
-	if err != nil {
-		return err
-	}
-
-	_, e := createDestination.Exec(m.Inline, m.Street, m.District, m.City, m.ZipCode, m.Country, m.State, m.Number, m.Lat, m.Lng)
-
-	if e != nil {
-		return e
-	}
 
 	return nil
 }
@@ -100,6 +79,26 @@ func (m *Maps) getRedisCacheMapGetByInline() error {
 	if err := json.Unmarshal([]byte(value), &m); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (m *Maps) CreateMaps() error {
+	sql := db.ConnectDatabase()
+
+	query := "insert into maps (inline, street, district, city, zipCode, country, `state`, `number`, lat, lng) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+
+	createDestination, err := sql.Prepare(query)
+
+	if err != nil {
+		return err
+	}
+
+	_, e := createDestination.Exec(m.Inline, m.Street, m.District, m.City, m.ZipCode, m.Country, m.State, m.Number, m.Lat, m.Lng)
+
+	if e != nil {
+		return e
+	}
+
 	return nil
 }
 
