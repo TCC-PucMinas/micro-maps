@@ -85,7 +85,7 @@ func (m *Maps) getRedisCacheMapGetByInline() error {
 func (m *Maps) CreateMaps() error {
 	sql := db.ConnectDatabase()
 
-	query := "insert into maps (inline, street, district, city, zipCode, country, `state`, `number`, lat, lng) values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	query := "insert into maps (inline, street, district, city, zipCode, country, `state`, `number`, lat, lng) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
 	createDestination, err := sql.Prepare(query)
 
@@ -139,7 +139,9 @@ func GetMapByAddres(inline string) (Maps, error) {
 		}
 	}
 
-	_ = m.setRedisCacheMapGetByInline()
+	if m.Id != 0 {
+		_ = m.setRedisCacheMapGetByInline()
+	}
 
 	return m, nil
 }

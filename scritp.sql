@@ -1,4 +1,4 @@
-drop database if exists db_maps;
+-- drop database if exists db_maps;
 create database db_maps;
 
 use db_maps;
@@ -14,6 +14,8 @@ create table maps (
     state varchar(255) not null,
     zipCode varchar(255) not null,
     number varchar(255) not null,
+    lat varchar(255) not null,
+    lng varchar(255) not null,
     `created_at` datetime default now()
 );
 

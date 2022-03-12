@@ -38,7 +38,7 @@ func (calc *Calculate) setRedisCacheCalculateOriginAndDestiny() error {
 	if err != nil {
 		return err
 	}
-	key := fmt.Sprintf("%v - % -%v", keyCalculateOriginAndDestiny, calc.OriginToString(), calc.DestinyToString())
+	key := fmt.Sprintf("%v - %v - %v", keyCalculateOriginAndDestiny, calc.OriginToString(), calc.DestinyToString())
 
 	return redis.Set(key, marshal, 24*time.Hour).Err()
 }
@@ -51,7 +51,7 @@ func (calc *Calculate) getRedisCacheCalculateOriginAndDestiny() error {
 		return err
 	}
 
-	key := fmt.Sprintf("%v - % -%v", keyCalculateOriginAndDestiny, calc.OriginToString(), calc.DestinyToString())
+	key := fmt.Sprintf("%v - %v - %v", keyCalculateOriginAndDestiny, calc.OriginToString(), calc.DestinyToString())
 
 	value, err := redis.Get(key).Result()
 
@@ -150,16 +150,14 @@ func (calc *Calculate) InsertCalculate() error {
 
 func (calc *Calculate) GetCalculateOriginAndDestiny() error {
 
-	calcGet := &Calculate{}
-
-	if err := calcGet.getRedisCacheCalculateOriginAndDestiny(); err == nil {
-		calc = calcGet
+	if err := calc.getRedisCacheCalculateOriginAndDestiny(); err == nil {
 		return nil
 	}
 
 	sql := db.ConnectDatabase()
 
-	query := `select id, origin, destiny, humanReadble, meters from calculates where origin = ? and destiny = ? limit 1;`
+	query := `select id, origin, destiny, humanReadble, meters from calculates 
+					where JSON_CONTAINS(origin, ?) and JSON_CONTAINS(destiny, ?) limit 1;`
 
 	requestCalculate, err := sql.Query(query, calc.OriginToString(), calc.DestinyToString())
 
@@ -180,8 +178,9 @@ func (calc *Calculate) GetCalculateOriginAndDestiny() error {
 			calc.Meters = meters
 		}
 	}
-
-	_ = calc.setRedisCacheCalculateOriginAndDestiny()
+	if calc.Id != 0 {
+		_ = calc.setRedisCacheCalculateOriginAndDestiny()
+	}
 
 	return nil
 }

@@ -24,10 +24,10 @@ func (s *MapServer) GetLocation(ctx context.Context, request *communicate.Geloca
 
 	maps.GenerateInline()
 
-	if m, _ := models.GetMapByAddres(maps.Inline); m.Id != 0 {
+	if m, err := models.GetMapByAddres(maps.Inline); err != nil && m.Id != 0 {
 		res = &communicate.GelocationResponse{
-			Lat: maps.Lat,
-			Lng: maps.Lng,
+			Lat: m.Lat,
+			Lng: m.Lng,
 		}
 		return res, nil
 	}
@@ -36,9 +36,7 @@ func (s *MapServer) GetLocation(ctx context.Context, request *communicate.Geloca
 		return res, err
 	}
 
-	if err := maps.CreateMaps(); err != nil {
-		return res, err
-	}
+	_ = maps.CreateMaps()
 
 	res = &communicate.GelocationResponse{
 		Lat: maps.Lat,
@@ -60,13 +58,13 @@ func (s *MapServer) DirectionLocation(ctx context.Context, request *communicate.
 		Lat: request.Destiny.Lat,
 		Lng: request.Destiny.Lng,
 	}
+
 	serviceCalculate := models.Calculate{
 		Origin:  origin,
 		Destiny: destiny,
 	}
 
-	// get cache calculate or database
-	if err := serviceCalculate.GetCalculateOriginAndDestiny(); err == nil || serviceCalculate.Id == 0 {
+	if err := serviceCalculate.GetCalculateOriginAndDestiny(); err == nil && serviceCalculate.Id != 0 {
 		originResponse := &communicate.LatAndLng{
 			Lat: origin.Lat,
 			Lng: origin.Lng,
@@ -77,7 +75,6 @@ func (s *MapServer) DirectionLocation(ctx context.Context, request *communicate.
 			Lng: destiny.Lng,
 		}
 
-		res.HumanReadable = serviceCalculate.HumanReadable
 		res.Meters = int64(serviceCalculate.Meters)
 		res.HumanReadable = serviceCalculate.HumanReadable
 
@@ -100,9 +97,12 @@ func (s *MapServer) DirectionLocation(ctx context.Context, request *communicate.
 		Lng: destiny.Lng,
 	}
 
+	if err := serviceCalculate.InsertCalculate(); err != nil {
+		return res, nil
+	}
+
 	res.HumanReadable = serviceCalculate.HumanReadable
 	res.Meters = int64(serviceCalculate.Meters)
-	res.HumanReadable = serviceCalculate.HumanReadable
 
 	res.Origin = originResponse
 	res.Destiny = destinyResponse
