@@ -121,12 +121,12 @@ func GetMapByAddres(inline string) (Maps, error) {
 	}
 
 	for requestConfig.Next() {
-		var inline, street, district, zipCode, city, country, state, number, lat, lng string
+		var inlineString, street, district, zipCode, city, country, state, number, lat, lng string
 		var id int64
-		_ = requestConfig.Scan(&id, &inline, &street, &district, &zipCode, &city, &country, &state, &number, &lat, &lng)
+		_ = requestConfig.Scan(&id, &inlineString, &street, &district, &zipCode, &city, &country, &state, &number, &lat, &lng)
 		if id != 0 {
 			m.Id = id
-			m.Inline = inline
+			m.Inline = inlineString
 			m.Street = street
 			m.District = district
 			m.ZipCode = zipCode

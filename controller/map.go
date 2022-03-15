@@ -24,7 +24,7 @@ func (s *MapServer) GetLocation(ctx context.Context, request *communicate.Geloca
 
 	maps.GenerateInline()
 
-	if m, err := models.GetMapByAddres(maps.Inline); err != nil && m.Id != 0 {
+	if m, err := models.GetMapByAddres(maps.Inline); err == nil && m.Id != 0 {
 		res = &communicate.GelocationResponse{
 			Lat: m.Lat,
 			Lng: m.Lng,

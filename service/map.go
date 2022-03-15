@@ -24,8 +24,6 @@ func CalculateRoute(origin, destiny string) (int, string, time.Duration, error) 
 	r := &maps.DirectionsRequest{
 		Origin:      origin,
 		Destination: destiny,
-		// Origin:      fmt.Sprintf("%v, %v", calc.Origin.Lat, calc.Origin.Lng),
-		// Destination: fmt.Sprintf("%v, %v", calc.Destiny.Lat, calc.Destiny.Lng),
 	}
 
 	rout, _, err := c.Directions(context.Background(), r)
