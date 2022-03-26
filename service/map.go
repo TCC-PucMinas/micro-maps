@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 	"fmt"
-	"googlemaps.github.io/maps"
 	"time"
+
+	"googlemaps.github.io/maps"
 )
 
 var keyGoogle = "AIzaSyD5Qni6QsI9nC4GGtwr1kpBss24Zo9KIN8"
@@ -14,7 +15,7 @@ func CalculateRoute(origin, destiny string) (int, string, time.Duration, error) 
 	var meters int
 	var humanReadable string
 	var duration time.Duration
-	// refatorar essa parte retirando isso do modelo
+
 	c, err := maps.NewClient(maps.WithAPIKey(keyGoogle))
 
 	if err != nil {

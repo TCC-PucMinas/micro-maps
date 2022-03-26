@@ -109,3 +109,11 @@ func (s *MapServer) DirectionLocation(ctx context.Context, request *communicate.
 
 	return res, nil
 }
+
+func (s *MapServer) OrderRoutes(ctx context.Context, request *communicate.OrderRoutesRequest) (*communicate.OrderRoutesResponse, error) {
+	res := &communicate.OrderRoutesResponse{
+		Routes: request.Routes,
+	}
+	// TODO: calcular as rotas mais próximas com base no array.
+	return res, nil
+}

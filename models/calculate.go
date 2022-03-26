@@ -8,10 +8,6 @@ import (
 	"time"
 )
 
-var (
-	keyCalculateOriginAndDestiny = "key-calculate-get-by-origin-and-destiny"
-)
-
 type LatAndLng struct {
 	Lat string
 	Lng string
@@ -24,45 +20,6 @@ type Calculate struct {
 	HumanReadable string
 	Meters        int
 	Duration      time.Duration
-}
-
-func (calc *Calculate) setRedisCacheCalculateOriginAndDestiny() error {
-	redis, err := db.ConnectDatabaseRedis()
-
-	if err != nil {
-		return err
-	}
-
-	marshal, err := json.Marshal(calc)
-
-	if err != nil {
-		return err
-	}
-	key := fmt.Sprintf("%v - %v - %v", keyCalculateOriginAndDestiny, calc.OriginToString(), calc.DestinyToString())
-
-	return redis.Set(key, marshal, 24*time.Hour).Err()
-}
-
-func (calc *Calculate) getRedisCacheCalculateOriginAndDestiny() error {
-
-	redis, err := db.ConnectDatabaseRedis()
-
-	if err != nil {
-		return err
-	}
-
-	key := fmt.Sprintf("%v - %v - %v", keyCalculateOriginAndDestiny, calc.OriginToString(), calc.DestinyToString())
-
-	value, err := redis.Get(key).Result()
-
-	if err != nil {
-		return err
-	}
-
-	if err := json.Unmarshal([]byte(value), &calc); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (calc *Calculate) CalculateRoute() error {
@@ -150,10 +107,6 @@ func (calc *Calculate) InsertCalculate() error {
 
 func (calc *Calculate) GetCalculateOriginAndDestiny() error {
 
-	if err := calc.getRedisCacheCalculateOriginAndDestiny(); err == nil {
-		return nil
-	}
-
 	sql := db.ConnectDatabase()
 
 	query := `select id, origin, destiny, humanReadble, meters from calculates 
@@ -177,9 +130,6 @@ func (calc *Calculate) GetCalculateOriginAndDestiny() error {
 			calc.HumanReadable = humanReadble
 			calc.Meters = meters
 		}
-	}
-	if calc.Id != 0 {
-		_ = calc.setRedisCacheCalculateOriginAndDestiny()
 	}
 
 	return nil

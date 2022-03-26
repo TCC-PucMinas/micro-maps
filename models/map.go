@@ -1,14 +1,8 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
 	"micro-maps/db"
-	"time"
-)
-
-var (
-	keyMapByAddress = "key-map-get-by-address"
 )
 
 type Maps struct {
@@ -43,45 +37,6 @@ func (m *Maps) GetLocation() error {
 	return nil
 }
 
-func (m *Maps) setRedisCacheMapGetByInline() error {
-	redis, err := db.ConnectDatabaseRedis()
-
-	if err != nil {
-		return err
-	}
-
-	marshal, err := json.Marshal(m)
-
-	if err != nil {
-		return err
-	}
-	key := fmt.Sprintf("%v - %v", keyMapByAddress, m.Inline)
-
-	return redis.Set(key, marshal, 24*time.Hour).Err()
-}
-
-func (m *Maps) getRedisCacheMapGetByInline() error {
-
-	redis, err := db.ConnectDatabaseRedis()
-
-	if err != nil {
-		return err
-	}
-
-	key := fmt.Sprintf("%v - %v", keyMapByAddress, m.Inline)
-
-	value, err := redis.Get(key).Result()
-
-	if err != nil {
-		return err
-	}
-
-	if err := json.Unmarshal([]byte(value), &m); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (m *Maps) CreateMaps() error {
 	sql := db.ConnectDatabase()
 
@@ -105,10 +60,6 @@ func (m *Maps) CreateMaps() error {
 func GetMapByAddres(inline string) (Maps, error) {
 
 	m := Maps{}
-
-	if err := m.getRedisCacheMapGetByInline(); err == nil {
-		return m, nil
-	}
 
 	sql := db.ConnectDatabase()
 
@@ -137,10 +88,6 @@ func GetMapByAddres(inline string) (Maps, error) {
 			m.Lat = lat
 			m.Lng = lng
 		}
-	}
-
-	if m.Id != 0 {
-		_ = m.setRedisCacheMapGetByInline()
 	}
 
 	return m, nil
