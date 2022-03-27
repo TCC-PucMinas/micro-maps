@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"google.golang.org/grpc"
 	"micro-maps/communicate"
 	"micro-maps/controller"
 	"net"
+
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -28,4 +29,5 @@ func main() {
 	if err := grpcServer.Serve(listener); err != nil {
 		panic(err.Error())
 	}
+
 }

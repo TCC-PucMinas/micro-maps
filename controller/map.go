@@ -111,9 +111,14 @@ func (s *MapServer) DirectionLocation(ctx context.Context, request *communicate.
 }
 
 func (s *MapServer) OrderRoutes(ctx context.Context, request *communicate.OrderRoutesRequest) (*communicate.OrderRoutesResponse, error) {
-	res := &communicate.OrderRoutesResponse{
-		Routes: request.Routes,
+	res := &communicate.OrderRoutesResponse{}
+
+	response, err := models.CalculateRoutes(request.Routes)
+	if err != nil {
+		return res, err
 	}
-	// TODO: calcular as rotas mais próximas com base no array.
+
+	res.Routes = response
+
 	return res, nil
 }
