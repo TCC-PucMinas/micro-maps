@@ -114,6 +114,7 @@ func (s *MapServer) OrderRoutes(ctx context.Context, request *communicate.OrderR
 	res := &communicate.OrderRoutesResponse{}
 
 	response, err := models.CalculateRoutes(request.Routes)
+
 	if err != nil {
 		return res, err
 	}

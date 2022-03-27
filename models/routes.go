@@ -52,7 +52,7 @@ func setOriginCalc(arrayRoutes, newArrayOrder []*communicate.Routes) ([]*communi
 		for index, v := range arrayRoutes {
 			if v.IdCourier == calc.Id {
 				v.Order = int64(len(newArrayOrder) + 1)
-				newArrayOrder = append(newArrayOrder, arrayRoutes[index])
+				newArrayOrder = append(newArrayOrder, v)
 				arrayRoutes = removeIndex(arrayRoutes, index)
 				return setOriginCalc(setNewOrigin(calc, arrayRoutes), newArrayOrder)
 			}
@@ -66,5 +66,5 @@ func CalculateRoutes(arrayRoutesOrder []*communicate.Routes) ([]*communicate.Rou
 
 	var arrayRoutes []*communicate.Routes
 
-	return setOriginCalc(arrayRoutes, arrayRoutesOrder)
+	return setOriginCalc(arrayRoutesOrder, arrayRoutes)
 }
