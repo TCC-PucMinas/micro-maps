@@ -3,12 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"googlemaps.github.io/maps"
 )
 
-var keyGoogle = "AIzaSyD5Qni6QsI9nC4GGtwr1kpBss24Zo9KIN8"
+var keyGoogle = os.Getenv("GOOGLE_MAP_KEY")
 
 func CalculateRoute(origin, destiny string) (int, string, time.Duration, error) {
 
